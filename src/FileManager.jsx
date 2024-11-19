@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-    import { useTheme } from './ThemeContext'
+    import { useTheme } from './ThemeContext.jsx'
 
     export default function FileManager({ onLoad, onSave, currentPoem }) {
       const [savedPoems, setSavedPoems] = useState([])
@@ -32,10 +32,6 @@ import React, { useState, useEffect } from 'react'
         onSave(newPoem)
       }
 
-      const handleLoad = (poem) => {
-        onLoad(poem.content)
-      }
-
       const handleDelete = (id) => {
         const updatedPoems = savedPoems.filter(poem => poem.id !== id)
         localStorage.setItem('poems', JSON.stringify(updatedPoems))
@@ -45,17 +41,14 @@ import React, { useState, useEffect } from 'react'
       return (
         <div className="file-manager" style={{
           background: currentTheme.sidebar,
-          borderColor: currentTheme.border,
-          color: currentTheme.text
+          borderColor: currentTheme.border
         }}>
-          <h3>File Manager</h3>
-          
           <div className="save-form">
             <input
               type="text"
               value={poemTitle}
               onChange={(e) => setPoemTitle(e.target.value)}
-              placeholder="Enter poem title"
+              placeholder="Enter poem title..."
               style={{
                 background: currentTheme.editorBg,
                 color: currentTheme.text,
@@ -69,27 +62,27 @@ import React, { useState, useEffect } from 'react'
                 color: currentTheme.background
               }}
             >
-              Save Poem
+              Save
             </button>
           </div>
 
           <div className="saved-poems">
-            <h4>Saved Poems</h4>
+            <h3>Saved Poems</h3>
             {savedPoems.length === 0 ? (
               <p className="no-poems">No saved poems yet</p>
             ) : (
               <ul>
                 {savedPoems.map(poem => (
-                  <li key={poem.id}>
+                  <li key={poem.id} style={{ borderColor: currentTheme.border }}>
                     <div className="poem-info">
-                      <span>{poem.title}</span>
+                      <span className="poem-title">{poem.title}</span>
                       <span className="poem-date">
                         {new Date(poem.date).toLocaleDateString()}
                       </span>
                     </div>
                     <div className="poem-actions">
                       <button
-                        onClick={() => handleLoad(poem)}
+                        onClick={() => onLoad(poem.content)}
                         style={{
                           background: currentTheme.accent,
                           color: currentTheme.background
@@ -100,10 +93,6 @@ import React, { useState, useEffect } from 'react'
                       <button
                         onClick={() => handleDelete(poem.id)}
                         className="delete-btn"
-                        style={{
-                          background: '#e74c3c',
-                          color: currentTheme.background
-                        }}
                       >
                         Delete
                       </button>

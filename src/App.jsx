@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react'
     import ThemeSelector from './ThemeSelector.jsx'
+    import FileManager from './FileManager.jsx'
     import { useTheme } from './ThemeContext.jsx'
 
     function App() {
       const [poem, setPoem] = useState('')
       const [lineSyllableCounts, setLineSyllableCounts] = useState([])
       const [rhymingWords, setRhymingWords] = useState([])
+      const [showFileManager, setShowFileManager] = useState(false)
       const { currentTheme } = useTheme()
       const textareaRef = useRef(null)
       const syllableContainerRef = useRef(null)
@@ -86,6 +88,15 @@ import React, { useState, useEffect, useRef } from 'react'
         return () => clearTimeout(timeoutId)
       }, [poem])
 
+      const handleSave = () => {
+        setShowFileManager(false)
+      }
+
+      const handleLoad = (poemContent) => {
+        setPoem(poemContent)
+        setShowFileManager(false)
+      }
+
       return (
         <div className="editor-container" style={{ 
           background: currentTheme.background,
@@ -94,51 +105,71 @@ import React, { useState, useEffect, useRef } from 'react'
           <header>
             <h1>Poetry Editor</h1>
             <div className="header-actions">
+              <button
+                onClick={() => setShowFileManager(!showFileManager)}
+                className="file-button"
+                style={{
+                  background: currentTheme.accent,
+                  color: currentTheme.background
+                }}
+              >
+                {showFileManager ? 'Hide Files' : 'Show Files'}
+              </button>
               <ThemeSelector />
             </div>
           </header>
           
-          <div className="editor-layout">
-            <div className="editor-main">
-              <div 
-                className="syllable-counts"
-                ref={syllableContainerRef}
-              >
-                <div className="syllable-counts-content">
-                  {poem.split('\n').map((line, index) => (
-                    <div key={index} className="line-count">
-                      {lineSyllableCounts[index] || 0}
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <textarea
-                ref={textareaRef}
-                value={poem}
-                onChange={(e) => setPoem(e.target.value)}
-                onScroll={handleScroll}
-                placeholder="Write your poem here..."
-                style={{
-                  background: currentTheme.editorBg,
-                  color: currentTheme.text,
-                  borderColor: currentTheme.border
-                }}
+          <div className="workspace">
+            {showFileManager && (
+              <FileManager
+                onLoad={handleLoad}
+                onSave={handleSave}
+                currentPoem={poem}
               />
-            </div>
-            <div className="rhyming-words" style={{
-              background: currentTheme.sidebar,
-              borderColor: currentTheme.border
-            }}>
-              <h3>Rhyming Words</h3>
-              {rhymingWords.length > 0 ? (
-                <ul>
-                  {rhymingWords.map((word, index) => (
-                    <li key={index}>{word}</li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No rhyming words found</p>
-              )}
+            )}
+            
+            <div className="editor-layout">
+              <div className="editor-main">
+                <div 
+                  className="syllable-counts"
+                  ref={syllableContainerRef}
+                >
+                  <div className="syllable-counts-content">
+                    {poem.split('\n').map((line, index) => (
+                      <div key={index} className="line-count">
+                        {lineSyllableCounts[index] || 0}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <textarea
+                  ref={textareaRef}
+                  value={poem}
+                  onChange={(e) => setPoem(e.target.value)}
+                  onScroll={handleScroll}
+                  placeholder="Write your poem here..."
+                  style={{
+                    background: currentTheme.editorBg,
+                    color: currentTheme.text,
+                    borderColor: currentTheme.border
+                  }}
+                />
+              </div>
+              <div className="rhyming-words" style={{
+                background: currentTheme.sidebar,
+                borderColor: currentTheme.border
+              }}>
+                <h3>Rhyming Words</h3>
+                {rhymingWords.length > 0 ? (
+                  <ul>
+                    {rhymingWords.map((word, index) => (
+                      <li key={index}>{word}</li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p>No rhyming words found</p>
+                )}
+              </div>
             </div>
           </div>
         </div>
